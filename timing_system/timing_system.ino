@@ -52,9 +52,8 @@ void loop() {
       unsigned long finishTime = millis();
       float elapsedSeconds = (finishTime - startTime) / 1000.0;
 
-      Serial.print("Finish detected! Time: ");
+      Serial.print("FINISHED: ");
       Serial.print(elapsedSeconds, 3);
-      Serial.println(" seconds");
 
       raceActive = false;
 
@@ -64,7 +63,7 @@ void loop() {
       digitalWrite(LEDB, HIGH);
 
       // Close the gate again
-      delay(1000);
+      // delay(1000);
       gateServo.write(CLOSED_ANGLE);
     }
   }
