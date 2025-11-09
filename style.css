@@ -1,0 +1,80 @@
+/* Layout */
+body {
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f9f9f9;
+}
+
+h1 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Timer Circle */
+.timer-circle {
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset -6px 0 12px rgba(0, 0, 0, 0.1),
+              inset 6px 0 12px rgba(0, 0, 0, 0.1);
+
+  transition: box-shadow 1s, background-color 1s;
+  margin-bottom: 40px;
+}
+
+.timer-circle.active {
+  box-shadow: 0 0 30px rgba(76, 175, 80, 0.6);
+}
+
+/* Time Text */
+#time {
+  font-size: 2em;
+  color: #333;
+}
+
+/* Button Styles */
+.button-group {
+  display: flex;
+  gap: 15px;
+}
+
+button {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+#start {
+  background-color: #4CAF50; /* green */
+}
+
+#stop {
+  background-color: #e53935; /* red */
+}
+
+#reset {
+  background-color: #fbc02d; /* yellow */
+}

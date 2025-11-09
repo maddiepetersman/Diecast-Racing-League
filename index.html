@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IR Timer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="timer-circle" id="timerCircle">
+    <div id="time">0 ms</div>
+  </div>
+
+  <div class="button-group">
+    <button id="start">Start</button>
+    <button id="stop">Stop</button>
+    <button id="reset">Reset</button>
+  </div>
+
+  <script>
+    const startButton = document.getElementById('start');
+    const stopButton = document.getElementById('stop');
+    const resetButton = document.getElementById('reset');
+    const timeDisplay = document.getElementById('time');
+    const timerCircle = document.getElementById('timerCircle');
+
+    let startTime;
+    let timerInterval;
+    let running = false;
+
+    // Start Timer
+    startButton.addEventListener('click', () => {
+      timerCircle.classList.add('active');
+
+      if (timerInterval) clearInterval(timerInterval);
+      startTime = Date.now();
+      running = true;
+
+      timerInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        timeDisplay.textContent = `${elapsed} ms`;
+      }, 50);
+    });
+
+    // Stop Timer
+    stopButton.addEventListener('click', () => {
+      if (!running) return;
+      running = false;
+      clearInterval(timerInterval);
+      timerCircle.classList.remove('active');
+    });
+
+    // Reset Timer
+    resetButton.addEventListener('click', () => {
+      running = false;
+      clearInterval(timerInterval);
+      timerCircle.classList.remove('active');
+      timeDisplay.textContent = '0 ms';
+    });
+  </script>
+</body>
+</html>
+
+
