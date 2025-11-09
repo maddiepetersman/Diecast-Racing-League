@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Race Timer</title>
+		<link rel="stylesheet" href="static/styles/style.css" />
+	</head>
+	<body>
+		<div class="container">
+			<div class="timer-circle" id="timerCircle">
+				<img src="sportscar.png" alt="Race Car" class="car-image" />
+				<div class="car-info">
+					<h2 class="car-name">Speedster GT</h2>
+					<p class="team-name">Lightning Racing</p>
+				</div>
+				<div class="time" id="time">0000 ms</div>
+			</div>
+
+			<div class="controls">
+				<button id="startButton">Start</button>
+				<button id="resetButton">Reset</button>
+			</div>
+		</div>
+
+		<script>
+			const timeDisplay = document.getElementById("time");
+			const timerCircle = document.getElementById("timerCircle");
+			const startButton = document.getElementById("startButton");
+			const resetButton = document.getElementById("resetButton");
+
+			let startTime, timerInterval;
+
+			// Start button
+			startButton.addEventListener("click", () => {
+				timerCircle.classList.add("active");
+				startTime = Date.now();
+				clearInterval(timerInterval);
+				timerInterval = setInterval(() => {
+					const elapsed = Date.now() - startTime;
+					timeDisplay.textContent = `${elapsed} ms`;
+				}, 10);
+			});
+
+			// Reset button
+			resetButton.addEventListener("click", () => {
+				clearInterval(timerInterval);
+				timeDisplay.textContent = "0000 ms";
+				timerCircle.classList.remove("active");
+			});
+		</script>
+	</body>
+</html>
