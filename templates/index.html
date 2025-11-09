@@ -1,53 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Race Timer</title>
-		<link rel="stylesheet" href="static/styles/style.css" />
-	</head>
-	<body>
-		<div class="container">
-			<div class="timer-circle" id="timerCircle">
-				<img src="sportscar.png" alt="Race Car" class="car-image" />
-				<div class="car-info">
-					<h2 class="car-name">Speedster GT</h2>
-					<p class="team-name">Lightning Racing</p>
-				</div>
-				<div class="time" id="time">0000 ms</div>
-			</div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Race Timer</title>
+  <style>
+    :root {
+      --green: #22c55e;
+      --gray-bg: #f3f4f6;
+      --gray-500: #6b7280;
+      --gray-800: #1f2937;
+      --white: #ffffff;
+      --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      --font-mono: 'APK Praktikal Trial', monospace;
+    }
 
-			<div class="controls">
-				<button id="startButton">Start</button>
-				<button id="resetButton">Reset</button>
-			</div>
-		</div>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-		<script>
-			const timeDisplay = document.getElementById("time");
-			const timerCircle = document.getElementById("timerCircle");
-			const startButton = document.getElementById("startButton");
-			const resetButton = document.getElementById("resetButton");
+    body {
+      background-color: var(--gray-bg);
+      font-family: var(--font-mono);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
 
-			let startTime, timerInterval;
+    .app {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 80px;
+      z-index: 1;
+    }
 
-			// Start button
-			startButton.addEventListener("click", () => {
-				timerCircle.classList.add("active");
-				startTime = Date.now();
-				clearInterval(timerInterval);
-				timerInterval = setInterval(() => {
-					const elapsed = Date.now() - startTime;
-					timeDisplay.textContent = `${elapsed} ms`;
-				}, 10);
-			});
+    .panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
 
-			// Reset button
-			resetButton.addEventListener("click", () => {
-				clearInterval(timerInterval);
-				timeDisplay.textContent = "0000 ms";
-				timerCircle.classList.remove("active");
-			});
-		</script>
-	</body>
+    .panel-label {
+      text-transform: uppercase;
+      color: var(--gray-500);
+      letter-spacing: 2px;
+      font-size: 12px;
+    }
+
+    .circle {
+      width: 200px;
+      height: 200px;
+      background: var(--white);
+      border-radius: 50%;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12), var(--shadow-inner);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .circle.large {
+      width: 480px;
+      height: 480px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2), var(--shadow-inner);
+      padding: 30px;
+    }
+
+    .speed {
+      font-size: 64px;
+      color: var(--gray-800);
+    }
+
+    .unit {
+      color: var(--gray-500);
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .car-image {
+      width: 290px;
+      height: auto;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+
+    .car-name {
+      color: var(--gray-800);
+      font-size: 18px;
+    }
+
+    .team-name {
+      color: var(--gray-500);
+      font-size: 14px;
+      margin-top: 2px;
+      margin-bottom: 10px;
+    }
+
+    .time {
+      font-size: 48px;
+      color: var(--gray-800);
+      letter-spacing: -1px;
+    }
+
+    .milliseconds-label {
+      color: var(--gray-500);
+      text-transform: uppercase;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .status {
+      color: var(--gray-600);
+      text-transform: uppercase;
+      font-size: 14px;
+      letter-spacing: 3px;
+      margin-top: 10px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 30px;
+    }
+
+    .button {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-500);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--gray-800);
+    }
+
+    .button.start {
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.6), 0 0 60px rgba(34, 197, 94, 0.3);
+    }
+
+    .button:hover:not(:disabled) {
+      transform: scale(1.1);
+      opacity: 0.9;
+    }
+
+    .button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .placement {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .placement-number {
+      font-size: 64px;
+      color: var(--gray-800);
+    }
+
+    .placement-suffix {
+      font-size: 24px;
+      color: var(--gray-500);
+    }
+
+    .of-total {
+      color: var(--gray-500);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    /* Background radial glow when active */
+    .glow {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+
+    .glow.active .glow-circle {
+      width: 200vmax;
+      height: 200vmax;
+      opacity: 1;
+    }
+
+    /* Active pulsing ring */
+    .pulse-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      box-shadow: 0 0 60px 20px rgba(34, 197, 94, 0);
+      animation: pulse 2s ease-in-out infinite;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .pulse-ring.active {
+      opacity: 1;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow">
+    <div class="glow-circle"></div>
+  </div>
+
+  <div class="app">
+    <!-- Left Panel: Average Speed -->
+    <div class="panel">
+      <div class="panel-label">Average Speed</div>
+      <div class="circle">
+        <div class="speed" id="averageSpeed">0.0</div>
+        <div class="unit">mph</div>
+      </div>
+    </div>
+
+    <!-- Center Panel -->
+    <div class="panel">
+      <div class="circle large">
+        <div class="pulse-ring" id="pulseRing"></div>
+        <img src="../static/images/sportscar.png" alt="Race Car" class="car-image" />
+        <div class="car-name" id="carName">Speedster GT</div>
+        <div class="team-name" id="teamName">Lightning Racing</div>
+
+        <div class="time" id="timer">00:00.000</div>
+        <div class="milliseconds-label">Milliseconds</div>
+        <div class="status" id="statusText">Ready</div>
+      </div>
+
+      <div class="buttons">
+        <button class="button start" id="startBtn">▶</button>
+        <button class="button reset" id="resetBtn" disabled>⟳</button>
+      </div>
+    </div>
+
+    <!-- Right Panel: Placement -->
+    <div class="panel">
+      <div class="panel-label">Placement</div>
+      <div class="circle">
+        <div class="placement">
+          <div class="placement-number" id="placement">1</div>
+          <div class="placement-suffix" id="suffix">st</div>
+        </div>
+        <div class="of-total">of 3</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const timerEl = document.getElementById('timer');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const avgSpeedEl = document.getElementById('averageSpeed');
+    const statusEl = document.getElementById('statusText');
+    const glow = document.querySelector('.glow');
+    const pulseRing = document.getElementById('pulseRing');
+
+    let startTime = null;
+    let elapsed = 0;
+    let animationFrame;
+    let state = 'idle'; // idle, ready, timing, complete
+
+    function formatTime(ms) {
+      const mins = Math.floor(ms / 60000);
+      const secs = Math.floor((ms % 60000) / 1000);
+      const milli = Math.floor(ms % 1000);
+      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(milli).padStart(3, '0')}`;
+    }
+
+    function updateTimer() {
+      const now = Date.now();
+      elapsed = now - startTime;
+      timerEl.textContent = formatTime(elapsed);
+
+      // Fake speed calculation
+      const speed = Math.min(120, (elapsed / 1000) * 15);
+      avgSpeedEl.textContent = speed.toFixed(1);
+
+      animationFrame = requestAnimationFrame(updateTimer);
+    }
+
+    function handleStart() {
+      if (state !== 'idle') return;
+      state = 'ready';
+      statusEl.textContent = 'Get Set';
+      glow.classList.add('active');
+      startBtn.disabled = true;
+
+      setTimeout(() => {
+        startTiming();
+      }, 2000);
+    }
+
+    function startTiming() {
+      state = 'timing';
+      startTime = Date.now();
+      statusEl.textContent = 'Racing';
+      pulseRing.classList.add('active');
+      resetBtn.disabled = false;
+      animationFrame = requestAnimationFrame(updateTimer);
+    }
+
+    function stopTiming() {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      state = 'complete';
+      statusEl.textContent = 'Finished';
+      pulseRing.classList.remove('active');
+      glow.classList.remove('active');
+    }
+
+    function handleReset() {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      startTime = null;
+      elapsed = 0;
+      avgSpeedEl.textContent = '0.0';
+      timerEl.textContent = '00:00.000';
+      statusEl.textContent = 'Ready';
+      startBtn.disabled = false;
+      resetBtn.disabled = true;
+      glow.classList.remove('active');
+      pulseRing.classList.remove('active');
+      state = 'idle';
+    }
+
+    startBtn.addEventListener('click', handleStart);
+    resetBtn.addEventListener('click', handleReset);
+
+    // For demo, auto-finish after 10 seconds
+    setInterval(() => {
+      if (state === 'timing' && elapsed > 10000) {
+        stopTiming();
+      }
+    }, 500);
+  </script>
+</body>
 </html>
