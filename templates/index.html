@@ -1,3 +1,22 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+	$(document).ready(function () {
+		$("#startButton").on("click", function (e) {
+			e.preventDefault(); // Prevent default form submission if inside a form
+			$.ajax({
+				url: "/ajax_trigger",
+				type: "POST", // or 'POST' depending on your Flask route
+				success: function (response) {
+					console.log(response); // Handle the response from Flask
+				},
+				error: function (error) {
+					console.error("Error:", error);
+				},
+			});
+		});
+	});
+</script>
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
